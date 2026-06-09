@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.ReMarket_project" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <style name="Theme.ReMarket.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
+        <item name="postSplashScreenTheme">@style/Theme.ReMarket_project</item>
+    </style>
+</resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.remarket_project.ui.home.HomeFragment"
+        android:label="홈">
+        <action
+            android:id="@+id/action_homeFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.remarket_project.ui.search.SearchFragment"
+        android:label="검색">
+        <action
+            android:id="@+id/action_searchFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/wishlistFragment"
+        android:name="com.example.remarket_project.ui.wishlist.WishlistFragment"
+        android:label="찜목록">
+        <action
+            android:id="@+id/action_wishlistFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myPageFragment"
+        android:name="com.example.remarket_project.ui.mypage.MyPageFragment"
+        android:label="마이페이지">
+        <action
+            android:id="@+id/action_myPageFragment_to_mySalesFragment"
+            app:destination="@id/mySalesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.example.remarket_project.ui.product.ProductDetailFragment"
+        android:label="상품 상세">
+        <argument
+            android:name="productId"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mySalesFragment"
+        android:name="com.example.remarket_project.ui.mypage.MySalesFragment"
+        android:label="내 판매 목록">
+        <action
+            android:id="@+id/action_mySalesFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+    </fragment>
+
+</navigation>

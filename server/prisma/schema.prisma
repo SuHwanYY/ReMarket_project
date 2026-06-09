@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductStatus {
+  ON_SALE
+  RESERVED
+  SOLD_OUT
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  nickname  String     @unique
+  gender    String
+  region    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  products  Product[]
+  wishlists Wishlist[]
+
+  @@map("users")
+}
+
+model Product {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?        @db.Text
+  price       Int
+  category    String
+  status      ProductStatus  @default(ON_SALE)
+  sellerId    Int
+  seller      User           @relation(fields: [sellerId], references: [id])
+  images      ProductImage[]
+  wishlists   Wishlist[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  order     Int     @default(0)
+
+  @@map("product_images")
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("wishlists")
+}
