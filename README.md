@@ -243,18 +243,40 @@ ViewModel과 Repository를 통해 화면과 비즈니스 로직의 의존성을 
 <img width="388" height="837" alt="image" src="https://github.com/user-attachments/assets/5a92de86-ca52-46e6-a565-f86ebaaca045" />
 
 
+## 회원가입
+
+<img width="388" height="829" alt="image" src="https://github.com/user-attachments/assets/0addd339-35bc-4b55-bed6-9d30d2338bd3" />
+
+
 ## 홈 화면
 
-(스크린샷 추가)
+<img width="383" height="837" alt="image" src="https://github.com/user-attachments/assets/d193ec18-2bcc-433e-b714-14337c22f507" />
+
+
+## 홈 화면 메뉴
+
+<img width="380" height="834" alt="image" src="https://github.com/user-attachments/assets/da8932d6-0ee5-452b-b95a-8cb76896ce4b" />
+
 
 ## 상품 상세
 
-(스크린샷 추가)
+<img width="383" height="839" alt="image" src="https://github.com/user-attachments/assets/8f18136a-74c8-4458-a5b5-1bbe34ea9f1d" />
+
+
+## 검색
+<img width="384" height="837" alt="image" src="https://github.com/user-attachments/assets/a5bb3f66-5832-466f-b53b-9dfcab8a4713" />
+
+
+## 찜 목록
+<img width="387" height="839" alt="image" src="https://github.com/user-attachments/assets/94059b5d-a444-4ada-a134-2ab582bbb3a8" />
+
 
 ## 상품 등록
 
-(스크린샷 추가)
+<img width="377" height="829" alt="image" src="https://github.com/user-attachments/assets/ecf8daa8-7ed7-4eb5-8c7a-12c57af3c45a" />
+
 
 ## 마이페이지
 
-(스크린샷 추가)
+<img width="380" height="832" alt="image" src="https://github.com/user-attachments/assets/6b0f7ac1-723d-4f83-a0a0-4e1c0bf3cbe9" />
+
