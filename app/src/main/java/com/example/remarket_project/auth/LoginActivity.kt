@@ -4,96 +4,184 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.remarket_project.databinding.ActivityLoginBinding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import com.example.remarket_project.R
 import com.example.remarket_project.ui.home.HomeActivity
 import com.example.remarket_project.viewmodel.AuthViewModel
 
-// 로그인 화면
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
-
-    // ViewModel로 로그인 로직 분리
     private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        // 로그인 버튼 클릭 시 유효성 검사 먼저
-        binding.joinSuccessBtn.setOnClickListener {
-            if (validate()) {
-                viewModel.login(
-                    email = binding.emailArea.text.toString().trim(),
-                    password = binding.pwdArea.text.toString()
-                )
-            }
-        }
-
-        // 로그인 성공 시 토큰이랑 유저 정보 저장하고 홈으로 이동
-        viewModel.loginSuccess.observe(this) { loginData ->
-            loginData ?: return@observe
-            SessionManager.saveSession(
-                context = this,
-                token = loginData.token,
-                userId = loginData.user.id,
-                nickname = loginData.user.nickname,
-                email = loginData.user.email
+        setContent {
+            LoginScreen(
+                viewModel = viewModel,
+                onLoginSuccess = {
+                    startActivity(Intent(this, HomeActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                }
             )
-            Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, HomeActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
         }
+    }
+}
 
-        // 로딩 중 버튼 비활성화 (중복 요청 방지)
-        viewModel.isLoading.observe(this) { loading ->
-            binding.joinSuccessBtn.isEnabled = !loading
-        }
+@Composable
+private fun LoginScreen(
+    viewModel: AuthViewModel,
+    onLoginSuccess: () -> Unit
+) {
+    val context = LocalContext.current
 
-        viewModel.error.observe(this) { error ->
-            error?.let {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-                viewModel.clearError()
-            }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    val isLoading by viewModel.isLoading.observeAsState(false)
+    val loginSuccess by viewModel.loginSuccess.observeAsState(null)
+    val error by viewModel.error.observeAsState(null)
+
+    // 에러 토스트 — error가 null이 아닐 때만 실행
+    LaunchedEffect(error) {
+        if (error != null) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
         }
     }
 
-    // 입력값 유효성 검사
-    private fun validate(): Boolean {
-        var isValid = true
-        val email = binding.emailArea.text.toString().trim()
-        val pwd = binding.pwdArea.text.toString()
-
-        if (email.isEmpty()) {
-            binding.emailLayout.error = "이메일을 입력해주세요"
-            isValid = false
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.emailLayout.error = "올바른 이메일 형식이 아닙니다"
-            isValid = false
-        } else {
-            binding.emailLayout.error = null
+    // 로그인 성공 시 세션 저장 후 홈으로 이동
+    LaunchedEffect(loginSuccess) {
+        loginSuccess?.let { data ->
+            SessionManager.saveSession(
+                context = context,
+                token = data.token,
+                userId = data.user.id,
+                nickname = data.user.nickname,
+                email = data.user.email
+            )
+            Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
+            onLoginSuccess()
         }
+    }
 
-        if (pwd.isEmpty()) {
-            binding.pwdLayout.error = "비밀번호를 입력해주세요"
-            isValid = false
-        } else {
-            binding.pwdLayout.error = null
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 24.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.main_logo),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = {
+                email = it
+                emailError = null
+            },
+            label = { Text("이메일") },
+            isError = emailError != null,
+            supportingText = if (emailError != null) ({ Text(emailError!!) }) else null,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp, vertical = 5.dp)
+        )
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = {
+                if (it.length <= 20) {
+                    password = it
+                    passwordError = null
+                }
+            },
+            label = { Text("비밀번호") },
+            isError = passwordError != null,
+            supportingText = if (passwordError != null) ({ Text(passwordError!!) }) else null,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp, vertical = 5.dp)
+        )
+
+        Button(
+            onClick = {
+                val trimmedEmail = email.trim()
+                var valid = true
+
+                if (trimmedEmail.isEmpty()) {
+                    emailError = "이메일을 입력해주세요"
+                    valid = false
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(trimmedEmail).matches()) {
+                    emailError = "올바른 이메일 형식이 아닙니다"
+                    valid = false
+                }
+
+                if (password.isEmpty()) {
+                    passwordError = "비밀번호를 입력해주세요"
+                    valid = false
+                }
+
+                if (valid) {
+                    viewModel.login(trimmedEmail, password)
+                }
+            },
+            enabled = !isLoading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(R.color.mainColor)
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            Text("로그인")
         }
-
-        return isValid
     }
 }
